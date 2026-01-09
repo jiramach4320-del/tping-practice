@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>ฝึกพิมพ์สัมผัสภาษาไทย — สุ่มบทความ จับเวลา WPM ตรวจคำผิด</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --primary: #2c3e50;
+      --muted: #6b7280;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Tahoma", "Noto Sans Thai", system-ui, sans-serif;
+      background: var(--bg);
+      color: #111827;
+      margin: 0;
+      padding: 32px;
+      line-height: 1.6;
+    }
+    h1 {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 28px;
+    }
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .original {
+      background: #f0f7ff;
+      border: 1px solid #dbeafe;
+    }
+    .text-block {
+      white-space: pre-wrap;
+      font-size: 18px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .secondary {
+      background: #6b7280;
+    }
+    .textarea {
+      width: 100%;
+      min-height: 180px;
+      font-size: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      outline: none;
+      resize: vertical;
+    }
+    .textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .stat .value {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 2px;
+    }
+    .highlight {
+      white-space: pre-wrap;
+      font-size: 18px;
+    }
+    .ok {
+      background: #eafff3;
+      border-bottom: 2px solid #b6f3cf;
+      border-radius: 4px;
+    }
+    .err {
+      background: #ffe9ea;
+      border-bottom: 2px solid #f5b5b8;
+      border-radius: 4px;
+    }
+    .warn {
+      background: #fff7e6;
+      border-bottom: 2px solid #ffd899;
+      border-radius: 4px;
+    }
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chip span {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border-radius: 4px;
+      border-bottom: 2px solid rgba(0,0,0,0.15);
+    }
+    .chip .ok-box { background: #eafff3; border-bottom-color: #b6f3cf; }
+    .chip .err-box { background: #ffe9ea; border-bottom-color: #f5b5b8; }
+    .chip .warn-box { background: #fff7e6; border-bottom-color: #ffd899; }
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 20px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ฝึกพิมพ์สัมผัสภาษาไทย</h1>
+    <div class="card original">
+      <div class="controls">
+        <button id="btnRandom">สุ่มบทความใหม่</button>
+        <button id="btnStart">เริ่มจับเวลา</button>
+        <button id="btnCheck" class="secondary" disabled>ตรวจผล</button>
+      </div>
+      <div class="legend">
+        <div class="chip"><span class="ok-box"></span>คำถูกต้อง</div>
+        <div class="chip"><span class="err-box"></span>คำผิด</div>
+        <div class="chip"><span class="warn-box"></span>คำเกิน/คำขาด</div>
+      </div>
+      <h3 style="margin-top: 16px; color: #1f2937; font-size: 18px;">บทความสำหรับพิมพ์</h3>
+      <div id="originalText" class="text-block"></div>
+    </div>
+
+    <div class="card">
+      <textarea id="typingArea" class="textarea" placeholder="พิมพ์บทความตามด้านบน โดยไม่มองแป้นพิมพ์..."></textarea>
+      <div class="stats">
+        <div class="stat">
+          <div class="label">เวลา</div>
+          <div id="timeDisplay" class="value">00:00</div>
+        </div>
+        <div class="stat">
+          <div class="label">WPM (คำต่อนาที)</div>
+          <div id="wpmDisplay" class="value">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">คำถูกต้อง</div>
+          <div id="correctCount" class="value">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">คำผิด/ต่างกัน</div>
+          <div id="errorCount" class="value">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin: 0 0 8px; color: #1f2937; font-size: 18px;">การไฮไลต์ผลการพิมพ์</h3>
+      <div id="highlightResult" class="highlight"></div>
+    </div>
+
+    <div class="footer">กด “สุ่มบทความใหม่” เพื่อเปลี่ยนเนื้อหาในแต่ละรอบ, กด “เริ่มจับเวลา” ก่อนพิมพ์ และ “ตรวจผล” เมื่อพิมพ์เสร็จ</div>
+  </div>
+
+  <script>
+    // บทความตัวอย่างสำหรับสุ่ม — คุณสามารถเพิ่ม/แก้ไขได้
+    const passages = [
+`เย็นวันหนึ่ง ลมพัดเบา ๆ ผ่านสวนสาธารณะ
+ต้นไม้เขียวชอุ่มส่งกลิ่นหอมสดชื่น
+คู่รักสองคนเดินจับมือกันไปตามทางเดิน
+เสียงหัวเราะเบา ๆ ทำให้บรรยากาศอบอุ่น
+เด็ก ๆ วิ่งเล่นไล่จับกันอย่างสนุกสนาน
+แสงอาทิตย์ยามเย็นส่องผ่านกิ่งไม้เป็นประกายงดงาม`,
+`เช้าวันฝนพรำ ผู้คนกางร่มหลากสีเดินไปยังสถานีรถไฟ
+เสียงหยดน้ำกระทบพื้นเป็นจังหวะสม่ำเสมอ
+กลิ่นดินเปียกชวนให้นึกถึงวันเก่า ๆ
+ร้านกาแฟมุมถนนเปิดเพลงเบา ๆ ต้อนรับลูกค้า
+เด็กนักเรียนวิ่งหลบฝนด้วยรอยยิ้มสดใส`,
+`ยามค่ำคืน เมืองสว่างไสวด้วยแสงไฟจากอาคารและถนน
+ผู้คนเดินคุยกันอย่างสบายใจในสวนริมแม่น้ำ
+ลมเย็นพัดพาเสียงดนตรีจากเวทีเล็ก ๆ ใกล้สะพาน
+ร้านขนมหวานขายไอศกรีมรสชาติต่าง ๆ
+ดาวดวงเล็กกระพริบแสงอยู่เหนือยอดตึกสูง`,
+`บ่ายวันเสาร์ ครอบครัวหนึ่งพากันไปปิกนิกที่สวนใหญ่
+อาหารง่าย ๆ ถูกจัดวางบนผ้าปูที่นุ่ม
+เสียงนกและแมลงทักทายอย่างสนุกสนาน
+เด็ก ๆ เล่นว่าวท่ามกลางลมอ่อน ๆ
+รอยยิ้มและเสียงหัวเราะทำให้วันนั้นอบอุ่นเป็นพิเศษ`,
+`เช้าวันทำงาน ถนนคึกคักด้วยรถและผู้คน
+รถเมล์แดงจอดรับผู้โดยสารที่ป้ายหน้าตลาด
+กลิ่นขนมปังอบใหม่ลอยมาจากร้านเบเกอรี่
+แม่ค้าผลไม้เรียกเชิญลูกค้าด้วยเสียงใส
+แสงแดดอุ่นละมุนช่วยให้ทุกอย่างดูสดใส`
+    ];
+
+    // สถานะและตัวจับเวลา
+    let originalText = "";
+    let startTime = null;
+    let timerInterval = null;
+
+    const elOriginal = document.getElementById("originalText");
+    const elTyping = document.getElementById("typingArea");
+    const elTime = document.getElementById("timeDisplay");
+    const elWpm = document.getElementById("wpmDisplay");
+    const elCorrect = document.getElementById("correctCount");
+    const elError = document.getElementById("errorCount");
+    const elHighlight = document.getElementById("highlightResult");
+    const btnRandom = document.getElementById("btnRandom");
+    const btnStart = document.getElementById("btnStart");
+    const btnCheck = document.getElementById("btnCheck");
+
+    // ฟังก์ชันช่วยเหลือ
+    const formatTime = (seconds) => {
+      const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+      const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    };
+
+    const normalizeSpaces = (text) =>
+      text.replace(/\s+/g, " ").trim();
+
+    const splitWords = (text) =>
+      normalizeSpaces(text).length ? normalizeSpaces(text).split(" ") : [];
+
+    const renderOriginal = () => {
+      elOriginal.textContent = originalText;
+    };
+
+    const startTimer = () => {
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        elTime.textContent = formatTime(elapsed);
+      }, 200);
+    };
+
+    const stopTimer = () => {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    };
+
+    const calcWPM = (typedText, elapsedSeconds) => {
+      const words = splitWords(typedText).length;
+      if (elapsedSeconds <= 0) return 0;
+      return Math.round((words / elapsedSeconds) * 60);
+    };
+
+    const highlightComparison = (original, user) => {
+      const oWords = splitWords(original);
+      const uWords = splitWords(user);
+
+      const maxLen = Math.max(oWords.length, uWords.length);
+      let correct = 0;
+      let errors = 0;
+      const parts = [];
+
+      for (let i = 0; i < maxLen; i++) {
+        const ow = oWords[i];
+        const uw = uWords[i];
+
+        if (ow === undefined && uw !== undefined) {
+          // คำเกิน
+          errors++;
+          parts.push(`<span class="warn">${uw}</span>`);
+          continue;
+        }
+        if (ow !== undefined && uw === undefined) {
+          // คำขาด — แสดงคำต้นฉบับเป็น warn เพื่อบอกว่ายังขาด
+          errors++;
+          parts.push(`<span class="warn">${ow}</span>`);
+          continue;
+        }
+        if (ow === uw) {
+          correct++;
+          parts.push(`<span class="ok">${uw}</span>`);
+        } else {
+          errors++;
+          // แสดงคำที่พิมพ์ผิด
+          parts.push(`<span class="err">${uw}</span>`);
+        }
+      }
+
+      elCorrect.textContent = String(correct);
+      elError.textContent = String(errors);
+      elHighlight.innerHTML = parts.join(" ");
+    };
+
+    const randomizePassage = () => {
+      const idx = Math.floor(Math.random() * passages.length);
+      originalText = passages[idx];
+      renderOriginal();
+      // รีเซ็ตสถานะ
+      elTyping.value = "";
+      elTime.textContent = "00:00";
+      elWpm.textContent = "0";
+      elCorrect.textContent = "0";
+      elError.textContent = "0";
+      elHighlight.innerHTML = "";
+      stopTimer();
+      btnCheck.disabled = true;
+    };
+
+    // อีเวนต์
+    btnRandom.addEventListener("click", () => {
+      randomizePassage();
+    });
+
+    btnStart.addEventListener("click", () => {
+      // เริ่มรอบใหม่โดยใช้บทความปัจจุบัน
+      elTyping.value = "";
+      elHighlight.innerHTML = "";
+      elCorrect.textContent = "0";
+      elError.textContent = "0";
+      elWpm.textContent = "0";
+      startTimer();
+      btnCheck.disabled = false;
+      elTyping.focus();
+    });
+
+    btnCheck.addEventListener("click", () => {
+      // หยุดเวลาและวิเคราะห์ผล
+      const elapsed = startTime ? (Date.now() - startTime) / 1000 : 0;
+      stopTimer();
+      const typed = elTyping.value;
+      const wpm = calcWPM(typed, elapsed);
+      elWpm.textContent = String(wpm);
+      highlightComparison(originalText, typed);
+      btnCheck.disabled = true;
+    });
+
+    // สุ่มบทความครั้งแรกตอนโหลด
+    randomizePassage();
+  </script>
+</body>
+</html>
