@@ -31,86 +31,10 @@
     ⏱ เวลา: <span id="timeDisplay">0.0</span> วินาที<br>
     📊 WPM: <span id="wpmDisplay">0</span><br>
     ✅ คำถูกต้อง: <span id="correctCount">0</span><br>
-    ❌ คำผิด: <span id="errorCount">0</span>
+    ❌ คำผิด/ต่างกัน: <span id="errorCount">0</span>
   </div>
   
   <div id="highlightResult" class="result"></div>
   
   <script>
-    const passages = [
-      "เย็นวันหนึ่ง ลมพัดเบา ๆ ผ่านสวนสาธารณะ ต้นไม้เขียวชอุ่มส่งกลิ่นหอมสดชื่น",
-      "เช้าวันฝนพรำ ผู้คนกางร่มหลากสีเดินไปยังสถานีรถไฟ เสียงหยดน้ำกระทบพื้นเป็นจังหวะ",
-      "ยามค่ำคืน เมืองสว่างไสวด้วยแสงไฟจากอาคารและถนน ผู้คนเดินคุยกันอย่างสบายใจ"
-    ];
-    
-    let originalText = "";
-    let startTime = null;
-    let timerInterval = null;
-    
-    const elOriginal = document.getElementById("originalText");
-    const elTyping = document.getElementById("typingArea");
-    const elTime = document.getElementById("timeDisplay");
-    const elWpm = document.getElementById("wpmDisplay");
-    const elCorrect = document.getElementById("correctCount");
-    const elError = document.getElementById("errorCount");
-    const elHighlight = document.getElementById("highlightResult");
-    const btnRandom = document.getElementById("btnRandom");
-    
-    function randomizePassage() {
-      const idx = Math.floor(Math.random() * passages.length);
-      originalText = passages[idx];
-      elOriginal.textContent = originalText;
-      elTyping.value = "";
-      elTime.textContent = "0.0";
-      elWpm.textContent = "0";
-      elCorrect.textContent = "0";
-      elError.textContent = "0";
-      elHighlight.innerHTML = "";
-      clearInterval(timerInterval);
-      startTime = null;
-    }
-    
-    function calcWPM(text, elapsedSeconds) {
-      const words = text.trim().split(/\s+/).filter(Boolean).length;
-      return elapsedSeconds > 0 ? Math.round((words / elapsedSeconds) * 60) : 0;
-    }
-    
-    function highlightComparison(original, user) {
-      const oWords = original.trim().split(/\s+/);
-      const uWords = user.trim().split(/\s+/);
-      let correct = 0, errors = 0;
-      let parts = [];
-      
-      for (let i = 0; i < uWords.length; i++) {
-        if (oWords[i] === uWords[i]) {
-          correct++;
-          parts.push(`<span class="correct">${uWords[i]}</span>`);
-        } else {
-          errors++;
-          parts.push(`<span class="wrong">${uWords[i]}</span>`);
-        }
-      }
-      
-      elCorrect.textContent = correct;
-      elError.textContent = errors;
-      elHighlight.innerHTML = parts.join(" ");
-    }
-    
-    elTyping.addEventListener("input", () => {
-      if (!startTime) {
-        startTime = Date.now();
-        timerInterval = setInterval(() => {
-          const elapsed = (Date.now() - startTime) / 1000;
-          elTime.textContent = elapsed.toFixed(1);
-          elWpm.textContent = calcWPM(elTyping.value, elapsed);
-        }, 200);
-      }
-      highlightComparison(originalText, elTyping.value);
-    });
-    
-    btnRandom.addEventListener("click", randomizePassage);
-    
-    randomizePassage(); // เริ่มด้วยบทความสุ่ม
-  </script>
-</body>
-</html>
+    const passages—
