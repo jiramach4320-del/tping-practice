@@ -6,11 +6,9 @@
   <style>
     body { font-family: Tahoma, sans-serif; margin: 40px; background: #f9f9f9; }
     h1 { color: #2c3e50; }
+    textarea { width: 100%; height: 150px; font-size: 16px; margin-top: 10px; }
     .original { background: #eef; padding: 15px; margin-bottom: 20px; }
-    .typingArea {
-      width: 100%; min-height: 150px; border: 1px solid #ccc;
-      padding: 10px; font-size: 16px; background: #fff;
-    }
+    .preview { background: #fff; border: 1px solid #ccc; padding: 10px; min-height: 50px; }
     .correct { color: green; }
     .wrong { color: red; font-weight: bold; }
     button { padding: 10px 20px; margin-top: 10px; }
@@ -24,8 +22,11 @@
     <p id="originalText"></p>
   </div>
   
-  <!-- ใช้ div ที่แก้ไขได้แทน textarea -->
-  <div id="typingArea" class="typingArea" contenteditable="true"></div>
+  <!-- ช่องแสดงผลตรวจสอบแบบเรียลไทม์ -->
+  <div id="preview" class="preview"></div>
+  
+  <!-- ช่องพิมพ์จริง -->
+  <textarea id="typingArea" placeholder="เริ่มพิมพ์ที่นี่..."></textarea>
   <br>
   <button id="btnRandom">สุ่มประโยคใหม่</button>
   
@@ -52,6 +53,7 @@
     
     const elOriginal = document.getElementById("originalText");
     const elTyping = document.getElementById("typingArea");
+    const elPreview = document.getElementById("preview");
     const elTime = document.getElementById("timeDisplay");
     const elWpm = document.getElementById("wpmDisplay");
     const elCorrect = document.getElementById("correctCount");
@@ -62,7 +64,8 @@
       const idx = Math.floor(Math.random() * passages.length);
       originalText = passages[idx];
       elOriginal.textContent = originalText;
-      elTyping.innerHTML = "";
+      elTyping.value = "";
+      elPreview.innerHTML = "";
       elTime.textContent = "0.0";
       elWpm.textContent = "0";
       elCorrect.textContent = "0";
@@ -77,9 +80,9 @@
       return elapsedSeconds > 0 ? Math.round((words / elapsedSeconds) * 60) : 0;
     }
     
-    function highlightText() {
-      const oWords = originalText.trim().split(/\s+/);
-      const uWords = elTyping.innerText.trim().split(/\s+/);
+    function highlightComparison(original, user) {
+      const oWords = original.trim().split(/\s+/);
+      const uWords = user.trim().split(/\s+/);
       let correct = 0, errors = 0;
       let parts = [];
       
@@ -95,7 +98,7 @@
       
       elCorrect.textContent = correct;
       elError.textContent = errors;
-      elTyping.innerHTML = parts.join(" ");
+      elPreview.innerHTML = parts.join(" ");
     }
     
     elTyping.addEventListener("input", () => {
@@ -105,10 +108,10 @@
         timerInterval = setInterval(() => {
           const elapsed = (Date.now() - startTime) / 1000;
           elTime.textContent = elapsed.toFixed(1);
-          elWpm.textContent = calcWPM(elTyping.innerText, elapsed);
+          elWpm.textContent = calcWPM(elTyping.value, elapsed);
         }, 200);
       }
-      highlightText();
+      highlightComparison(originalText, elTyping.value);
     });
     
     elTyping.addEventListener("keydown", (e) => {
@@ -119,8 +122,8 @@
           clearInterval(timerInterval);
           const elapsed = (Date.now() - startTime) / 1000;
           elTime.textContent = elapsed.toFixed(1);
-          elWpm.textContent = calcWPM(elTyping.innerText, elapsed);
-          highlightText();
+          elWpm.textContent = calcWPM(elTyping.value, elapsed);
+          highlightComparison(originalText, elTyping.value);
         }
       }
     });
