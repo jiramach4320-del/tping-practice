@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ฝึกพิมพ์สัมผัสภาษาไทย</title>
+  <title>ฝึกพิมพ์สัมผัสภาษาไทย - สอบปากคำ</title>
   <style>
     body { font-family: Tahoma, sans-serif; margin: 40px; background: #f9f9f9; }
     h1 { color: #2c3e50; }
@@ -13,11 +13,10 @@
     .wrong { color: red; font-weight: bold; }
     button { padding: 10px 20px; margin-top: 10px; }
     .stats { margin-top: 15px; }
-    .highlight-line { display: block; margin-bottom: 5px; }
   </style>
 </head>
 <body>
-  <h1>ฝึกพิมพ์สัมผัสภาษาไทย</h1>
+  <h1>ฝึกพิมพ์สัมผัสภาษาไทย (สถานการณ์สอบปากคำ)</h1>
   
   <div class="original">
     <p id="originalText"></p>
@@ -25,7 +24,7 @@
   
   <textarea id="typingArea" placeholder="เริ่มพิมพ์ที่นี่..."></textarea>
   <br>
-  <button id="btnRandom">สุ่มบทความใหม่</button>
+  <button id="btnRandom">สุ่มประโยคใหม่</button>
   
   <div class="stats">
     ⏱ เวลา: <span id="timeDisplay">0.0</span> วินาที<br>
@@ -37,10 +36,18 @@
   <div id="highlightResult" class="result"></div>
   
   <script>
+    // ตัวอย่างประโยคที่ใช้ในการสอบปากคำ
     const passages = [
-      "เย็นวันหนึ่ง ลมพัดเบา ๆ ผ่านสวนสาธารณะ\nต้นไม้เขียวชอุ่มส่งกลิ่นหอมสดชื่น",
-      "เช้าวันฝนพรำ ผู้คนกางร่มหลากสีเดินไปยังสถานีรถไฟ\nเสียงหยดน้ำกระทบพื้นเป็นจังหวะ",
-      "ยามค่ำคืน เมืองสว่างไสวด้วยแสงไฟจากอาคารและถนน\nผู้คนเดินคุยกันอย่างสบายใจ"
+      "ขอทราบชื่อและนามสกุลของคุณ",
+      "คุณอยู่ที่ไหนในเวลาที่เกิดเหตุ",
+      "เหตุการณ์เกิดขึ้นเมื่อเวลาใด",
+      "คุณเห็นใครอยู่ในที่เกิดเหตุบ้าง",
+      "กรุณาเล่ารายละเอียดเหตุการณ์ที่คุณพบเห็น",
+      "มีใครได้รับบาดเจ็บจากเหตุการณ์นี้หรือไม่",
+      "คุณรู้จักผู้ก่อเหตุหรือไม่",
+      "คุณสามารถบอกลักษณะของผู้ต้องสงสัยได้หรือไม่",
+      "คุณได้ยินเสียงอะไรผิดปกติในเวลานั้นหรือไม่",
+      "คุณมีหลักฐานหรือสิ่งของที่เกี่ยวข้องกับเหตุการณ์นี้หรือไม่"
     ];
     
     let originalText = "";
@@ -78,32 +85,24 @@
     }
     
     function highlightComparison(original, user) {
-      const oLines = original.split("\n");
-      const uLines = user.split("\n");
+      const oWords = original.trim().split(/\s+/);
+      const uWords = user.trim().split(/\s+/);
       let correct = 0, errors = 0;
       let parts = [];
       
-      for (let i = 0; i < oLines.length; i++) {
-        const oWords = oLines[i].trim().split(/\s+/);
-        const uWords = (uLines[i] || "").trim().split(/\s+/);
-        let lineParts = [];
-        
-        for (let j = 0; j < uWords.length; j++) {
-          if (oWords[j] === uWords[j]) {
-            correct++;
-            lineParts.push(`<span class="correct">${uWords[j]}</span>`);
-          } else {
-            errors++;
-            lineParts.push(`<span class="wrong">${uWords[j]}</span>`);
-          }
+      for (let i = 0; i < uWords.length; i++) {
+        if (oWords[i] === uWords[i]) {
+          correct++;
+          parts.push(`<span class="correct">${uWords[i]}</span>`);
+        } else {
+          errors++;
+          parts.push(`<span class="wrong">${uWords[i]}</span>`);
         }
-        
-        parts.push(`<div class="highlight-line">${lineParts.join(" ")}</div>`);
       }
       
       elCorrect.textContent = correct;
       elError.textContent = errors;
-      elHighlight.innerHTML = parts.join("");
+      elHighlight.innerHTML = parts.join(" ");
     }
     
     elTyping.addEventListener("input", () => {
@@ -135,7 +134,7 @@
     
     btnRandom.addEventListener("click", randomizePassage);
     
-    randomizePassage(); // เริ่มด้วยบทความสุ่ม
+    randomizePassage(); // เริ่มด้วยประโยคสุ่ม
   </script>
 </body>
 </html>
