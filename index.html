@@ -10,9 +10,10 @@
     .original { background: #eef; padding: 15px; margin-bottom: 20px; }
     .result { margin-top: 20px; font-weight: bold; }
     .correct { color: green; }
-    .wrong { color: red; }
+    .wrong { color: red; font-weight: bold; }
     button { padding: 10px 20px; margin-top: 10px; }
     .stats { margin-top: 15px; }
+    .highlight-line { display: block; margin-bottom: 5px; }
   </style>
 </head>
 <body>
@@ -37,14 +38,15 @@
   
   <script>
     const passages = [
-      "เย็นวันหนึ่ง ลมพัดเบา ๆ ผ่านสวนสาธารณะ ต้นไม้เขียวชอุ่มส่งกลิ่นหอมสดชื่น",
-      "เช้าวันฝนพรำ ผู้คนกางร่มหลากสีเดินไปยังสถานีรถไฟ เสียงหยดน้ำกระทบพื้นเป็นจังหวะ",
-      "ยามค่ำคืน เมืองสว่างไสวด้วยแสงไฟจากอาคารและถนน ผู้คนเดินคุยกันอย่างสบายใจ"
+      "เย็นวันหนึ่ง ลมพัดเบา ๆ ผ่านสวนสาธารณะ\nต้นไม้เขียวชอุ่มส่งกลิ่นหอมสดชื่น",
+      "เช้าวันฝนพรำ ผู้คนกางร่มหลากสีเดินไปยังสถานีรถไฟ\nเสียงหยดน้ำกระทบพื้นเป็นจังหวะ",
+      "ยามค่ำคืน เมืองสว่างไสวด้วยแสงไฟจากอาคารและถนน\nผู้คนเดินคุยกันอย่างสบายใจ"
     ];
     
     let originalText = "";
     let startTime = null;
     let timerInterval = null;
+    let testEnded = false;
     
     const elOriginal = document.getElementById("originalText");
     const elTyping = document.getElementById("typingArea");
@@ -67,6 +69,7 @@
       elHighlight.innerHTML = "";
       clearInterval(timerInterval);
       startTime = null;
+      testEnded = false;
     }
     
     function calcWPM(text, elapsedSeconds) {
@@ -75,27 +78,36 @@
     }
     
     function highlightComparison(original, user) {
-      const oWords = original.trim().split(/\s+/);
-      const uWords = user.trim().split(/\s+/);
+      const oLines = original.split("\n");
+      const uLines = user.split("\n");
       let correct = 0, errors = 0;
       let parts = [];
       
-      for (let i = 0; i < uWords.length; i++) {
-        if (oWords[i] === uWords[i]) {
-          correct++;
-          parts.push(`<span class="correct">${uWords[i]}</span>`);
-        } else {
-          errors++;
-          parts.push(`<span class="wrong">${uWords[i]}</span>`);
+      for (let i = 0; i < oLines.length; i++) {
+        const oWords = oLines[i].trim().split(/\s+/);
+        const uWords = (uLines[i] || "").trim().split(/\s+/);
+        let lineParts = [];
+        
+        for (let j = 0; j < uWords.length; j++) {
+          if (oWords[j] === uWords[j]) {
+            correct++;
+            lineParts.push(`<span class="correct">${uWords[j]}</span>`);
+          } else {
+            errors++;
+            lineParts.push(`<span class="wrong">${uWords[j]}</span>`);
+          }
         }
+        
+        parts.push(`<div class="highlight-line">${lineParts.join(" ")}</div>`);
       }
       
       elCorrect.textContent = correct;
       elError.textContent = errors;
-      elHighlight.innerHTML = parts.join(" ");
+      elHighlight.innerHTML = parts.join("");
     }
     
     elTyping.addEventListener("input", () => {
+      if (testEnded) return;
       if (!startTime) {
         startTime = Date.now();
         timerInterval = setInterval(() => {
@@ -105,6 +117,20 @@
         }, 200);
       }
       highlightComparison(originalText, elTyping.value);
+    });
+    
+    elTyping.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!testEnded) {
+          testEnded = true;
+          clearInterval(timerInterval);
+          const elapsed = (Date.now() - startTime) / 1000;
+          elTime.textContent = elapsed.toFixed(1);
+          elWpm.textContent = calcWPM(elTyping.value, elapsed);
+          highlightComparison(originalText, elTyping.value);
+        }
+      }
     });
     
     btnRandom.addEventListener("click", randomizePassage);
