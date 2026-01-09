@@ -2,13 +2,15 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ฝึกพิมพ์สัมผัสภาษาไทย - สอบปากคำ</title>
+  <title>ฝึกพิมพ์สัมผัสภาษาไทย</title>
   <style>
     body { font-family: Tahoma, sans-serif; margin: 40px; background: #f9f9f9; }
     h1 { color: #2c3e50; }
-    textarea { width: 100%; height: 200px; font-size: 16px; }
     .original { background: #eef; padding: 15px; margin-bottom: 20px; }
-    .result { margin-top: 20px; font-weight: bold; }
+    .typingArea {
+      width: 100%; min-height: 150px; border: 1px solid #ccc;
+      padding: 10px; font-size: 16px; background: #fff;
+    }
     .correct { color: green; }
     .wrong { color: red; font-weight: bold; }
     button { padding: 10px 20px; margin-top: 10px; }
@@ -16,13 +18,14 @@
   </style>
 </head>
 <body>
-  <h1>ฝึกพิมพ์สัมผัสภาษาไทย (สถานการณ์สอบปากคำ)</h1>
+  <h1>ฝึกพิมพ์สัมผัสภาษาไทย</h1>
   
   <div class="original">
     <p id="originalText"></p>
   </div>
   
-  <textarea id="typingArea" placeholder="เริ่มพิมพ์ที่นี่..."></textarea>
+  <!-- ใช้ div ที่แก้ไขได้แทน textarea -->
+  <div id="typingArea" class="typingArea" contenteditable="true"></div>
   <br>
   <button id="btnRandom">สุ่มประโยคใหม่</button>
   
@@ -33,21 +36,13 @@
     ❌ คำผิด: <span id="errorCount">0</span>
   </div>
   
-  <div id="highlightResult" class="result"></div>
-  
   <script>
-    // ตัวอย่างประโยคที่ใช้ในการสอบปากคำ
     const passages = [
-      "ขอทราบชื่อและนามสกุลของคุณ",
+      "กรุณาบอกชื่อและนามสกุลของคุณ",
       "คุณอยู่ที่ไหนในเวลาที่เกิดเหตุ",
       "เหตุการณ์เกิดขึ้นเมื่อเวลาใด",
       "คุณเห็นใครอยู่ในที่เกิดเหตุบ้าง",
-      "กรุณาเล่ารายละเอียดเหตุการณ์ที่คุณพบเห็น",
-      "มีใครได้รับบาดเจ็บจากเหตุการณ์นี้หรือไม่",
-      "คุณรู้จักผู้ก่อเหตุหรือไม่",
-      "คุณสามารถบอกลักษณะของผู้ต้องสงสัยได้หรือไม่",
-      "คุณได้ยินเสียงอะไรผิดปกติในเวลานั้นหรือไม่",
-      "คุณมีหลักฐานหรือสิ่งของที่เกี่ยวข้องกับเหตุการณ์นี้หรือไม่"
+      "กรุณาเล่ารายละเอียดเหตุการณ์ที่คุณพบเห็น"
     ];
     
     let originalText = "";
@@ -61,19 +56,17 @@
     const elWpm = document.getElementById("wpmDisplay");
     const elCorrect = document.getElementById("correctCount");
     const elError = document.getElementById("errorCount");
-    const elHighlight = document.getElementById("highlightResult");
     const btnRandom = document.getElementById("btnRandom");
     
     function randomizePassage() {
       const idx = Math.floor(Math.random() * passages.length);
       originalText = passages[idx];
       elOriginal.textContent = originalText;
-      elTyping.value = "";
+      elTyping.innerHTML = "";
       elTime.textContent = "0.0";
       elWpm.textContent = "0";
       elCorrect.textContent = "0";
       elError.textContent = "0";
-      elHighlight.innerHTML = "";
       clearInterval(timerInterval);
       startTime = null;
       testEnded = false;
@@ -84,9 +77,9 @@
       return elapsedSeconds > 0 ? Math.round((words / elapsedSeconds) * 60) : 0;
     }
     
-    function highlightComparison(original, user) {
-      const oWords = original.trim().split(/\s+/);
-      const uWords = user.trim().split(/\s+/);
+    function highlightText() {
+      const oWords = originalText.trim().split(/\s+/);
+      const uWords = elTyping.innerText.trim().split(/\s+/);
       let correct = 0, errors = 0;
       let parts = [];
       
@@ -102,7 +95,7 @@
       
       elCorrect.textContent = correct;
       elError.textContent = errors;
-      elHighlight.innerHTML = parts.join(" ");
+      elTyping.innerHTML = parts.join(" ");
     }
     
     elTyping.addEventListener("input", () => {
@@ -112,10 +105,10 @@
         timerInterval = setInterval(() => {
           const elapsed = (Date.now() - startTime) / 1000;
           elTime.textContent = elapsed.toFixed(1);
-          elWpm.textContent = calcWPM(elTyping.value, elapsed);
+          elWpm.textContent = calcWPM(elTyping.innerText, elapsed);
         }, 200);
       }
-      highlightComparison(originalText, elTyping.value);
+      highlightText();
     });
     
     elTyping.addEventListener("keydown", (e) => {
@@ -126,8 +119,8 @@
           clearInterval(timerInterval);
           const elapsed = (Date.now() - startTime) / 1000;
           elTime.textContent = elapsed.toFixed(1);
-          elWpm.textContent = calcWPM(elTyping.value, elapsed);
-          highlightComparison(originalText, elTyping.value);
+          elWpm.textContent = calcWPM(elTyping.innerText, elapsed);
+          highlightText();
         }
       }
     });
