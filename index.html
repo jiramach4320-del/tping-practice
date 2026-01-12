@@ -3,325 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Police Typing Test - Pro Edition</title>
+    <title>Police Typing Test - Stable Version</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #1a1c23;
-            --main-gold: #d4af37;
-            --error-red: #ff4b2b;
-            --success-green: #2ecc71;
-            --text-muted: #636e72;
-            --text-light: #dfe6e9;
+            --bg: #1a1c23;
+            --gold: #d4af37;
+            --error: #ff4b2b;
+            --success: #2ecc71;
+            --muted: #636e72;
+            --light: #dfe6e9;
         }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-light);
+            background: var(--bg); color: var(--light);
             font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0;
         }
-
-        .header h1 { color: var(--main-gold); margin-bottom: 5px; }
-        .header p { color: var(--text-muted); margin-top: 0; margin-bottom: 20px; }
-
-        /* เมนูเลือกเวลา */
-        .time-selector {
-            margin-bottom: 25px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            background: rgba(255,255,255,0.03);
-            padding: 10px 20px;
-            border-radius: 50px;
-        }
-
+        .container { text-align: center; width: 90%; max-width: 900px; }
+        .time-selector { margin-bottom: 20px; }
         .time-btn {
-            padding: 8px 18px;
-            background: transparent;
-            border: 1px solid var(--text-muted);
-            color: var(--text-light);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.3s;
+            padding: 8px 20px; margin: 0 5px; background: none; border: 1px solid var(--muted);
+            color: var(--light); border-radius: 20px; cursor: pointer;
         }
-
-        .time-btn.active {
-            background: var(--main-gold);
-            color: #000;
-            border-color: var(--main-gold);
-            font-weight: bold;
-        }
-
+        .time-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: bold; }
+        
         #stats-bar {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 25px;
-            background: rgba(255,255,255,0.05);
-            padding: 20px 50px;
-            border-radius: 15px;
-            border-bottom: 3px solid var(--main-gold);
+            display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px;
         }
-
-        .stat-item { text-align: center; min-width: 110px; }
-        .stat-value { display: block; font-size: 2rem; font-weight: bold; color: var(--main-gold); }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); }
-
+        .stat-val { display: block; font-size: 2rem; color: var(--gold); font-weight: bold; }
+        
         #word-container {
-            max-width: 900px;
-            height: 160px;
-            font-size: 26px;
-            line-height: 1.8;
-            background: #252a34;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            overflow: hidden;
-            word-wrap: break-word;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            height: 120px; overflow: hidden; font-size: 24px; line-height: 1.6;
+            background: #252a34; padding: 25px; border-radius: 12px; margin-bottom: 20px;
+            text-align: left; position: relative;
         }
-
-        .word { display: inline-block; margin-right: 12px; color: var(--text-muted); }
-        .word.current { color: #fff; border-bottom: 3px solid var(--main-gold); }
-        .word.correct { color: var(--success-green); }
-        .word.incorrect { color: var(--error-red); text-decoration: underline; }
+        .word { display: inline-block; margin-right: 12px; color: var(--muted); }
+        .word.current { color: #fff; background: rgba(212, 175, 55, 0.3); border-radius: 4px; }
+        .word.correct { color: var(--success); }
+        .word.incorrect { color: var(--error); text-decoration: underline; }
 
         #input-field {
-            width: 600px;
-            padding: 18px;
-            font-size: 24px;
-            border: 2px solid #3d4451;
-            border-radius: 12px;
-            outline: none;
-            font-family: 'Sarabun', sans-serif;
-            text-align: center;
-            transition: 0.3s;
+            width: 100%; max-width: 500px; padding: 15px; font-size: 22px;
+            border: 2px solid #3d4451; border-radius: 10px; outline: none; text-align: center;
         }
-
-        #input-field:focus { border-color: var(--main-gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
-        #input-field.input-error { background: #fff0f0; color: var(--error-red); border-color: var(--error-red); }
-
-        .btn-reset {
-            margin-top: 25px;
-            padding: 12px 30px;
-            background: transparent;
-            color: var(--main-gold);
-            border: 2px solid var(--main-gold);
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn-reset:hover { background: var(--main-gold); color: #000; }
+        #input-field.input-error { background: #fff0f0; color: var(--error); border-color: var(--error); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>ระบบทดสอบพิมพ์สัมผัสงานสอบสวน</h1>
-        <p>รวบรวมสำนวนและข้อกฎหมายที่ใช้จริง</p>
-    </div>
+<div class="container">
+    <h1 style="color: var(--gold);">ระบบทดสอบพิมพ์สัมผัสตำรวจ</h1>
 
-    <div class="time-selector" id="time-selector">
-        <span>ระยะเวลา:</span>
-        <button class="time-btn" onclick="setInitialTime(60, this)">1 นาที</button>
-        <button class="time-btn" onclick="setInitialTime(120, this)">2 นาที</button>
-        <button class="time-btn active" onclick="setInitialTime(180, this)">3 นาที</button>
+    <div class="time-selector" id="selector">
+        <button class="time-btn" onclick="setTime(60, this)">1 นาที</button>
+        <button class="time-btn" onclick="setTime(120, this)">2 นาที</button>
+        <button class="time-btn active" onclick="setTime(180, this)">3 นาที</button>
     </div>
 
     <div id="stats-bar">
-        <div class="stat-item">
-            <span id="timer" class="stat-value">03:00</span>
-            <span class="stat-label">เวลาที่เหลือ</span>
-        </div>
-        <div class="stat-item">
-            <span id="wpm" class="stat-value">0</span>
-            <span class="stat-label">WPM</span>
-        </div>
-        <div class="stat-item">
-            <span id="accuracy" class="stat-value">0%</span>
-            <span class="stat-label">ความแม่นยำ</span>
-        </div>
+        <div><span id="timer" class="stat-val">03:00</span><span>เวลา</span></div>
+        <div><span id="wpm" class="stat-val">0</span><span>WPM</span></div>
+        <div><span id="accuracy" class="stat-val">0%</span><span>แม่นยำ</span></div>
     </div>
 
     <div id="word-container"></div>
+    <input type="text" id="input-field" placeholder="เริ่มพิมพ์คำแรก..." autocomplete="off">
+    <br><br>
+    <button class="time-btn" onclick="resetGame()" style="border-color: var(--gold);">เริ่มใหม่</button>
+</div>
 
-    <input type="text" id="input-field" placeholder="เริ่มพิมพ์เพื่อเริ่มทดสอบ..." autofocus autocomplete="off">
-    
-    <button class="btn-reset" onclick="initGame()">เริ่มใหม่</button>
+<script>
+    const vocab = [
+        "พนักงานสอบสวน", "เจ้าพนักงาน", "ชุดสืบสวน", "ผู้เสียหาย", "ผู้ต้องหา", "พยาน", "ร้อยเวร", "สายตรวจ", 
+        "แจ้งข้อกล่าวหา", "ลงบันทึกประจำวัน", "ทำแผนประกอบ", "ดำเนินการ", "ตรวจยึด", "พยานหลักฐาน", "ตรวจสอบ", 
+        "ที่เกิดเหตุ", "เคหสถาน", "เวลาวิกาล", "ดำเนินคดี", "กฎหมายอาญา", "พระราชบัญญัติ", "โดยประมาท", "เจตนา"
+    ];
 
-    <script>
-        // คลังคำศัพท์งานสอบสวน (แยกกลุ่มเพื่อความหลากหลาย)
-        const vocab = {
-            subjects: ["พนักงานสอบสวน", "เจ้าพนักงานตำรวจ", "ชุดสืบสวน", "ผู้เสียหาย", "ผู้ต้องหา", "พยาน", "ร้อยเวร", "สายตรวจ", "ผู้ถูกจับกุม", "ทนายความ"],
-            actions: ["แจ้งข้อกล่าวหา", "ลงบันทึกประจำวัน", "ทำแผนประกอบคำรับสารภาพ", "ดำเนินการสอบสวน", "ตรวจยึดของกลาง", "รวบรวมพยานหลักฐาน", "ตรวจสอบที่เกิดเหตุ", "แจ้งสิทธิตามกฎหมาย", "บันทึกคำให้การ", "ส่งสำนวนคดี"],
-            details: ["ในเคหสถาน", "โดยไม่มีเหตุอันควร", "ตามคำให้การ", "อย่างเคร่งครัด", "ในเวลาวิกาล", "เพื่อดำเนินคดี", "ในที่เกิดเหตุ", "ตามระเบียบ", "โดยความสมัครใจ", "ท่ามกลางพยาน"],
-            lawTerms: ["ประมวลกฎหมายอาญา", "พระราชบัญญัติ", "ความผิดลหุโทษ", "พยานวัตถุ", "หมายค้นของศาล", "การกระทำโดยประมาท", "เจตนาฆ่า", "ลักทรัพย์ในเวลากลางคืน"]
-        };
+    let words = [], currentIndex = 0, selectedTime = 180, timer = 180;
+    let isStarted = false, interval = null, correctChars = 0, totalTyped = 0, errors = 0;
 
-        let words = [];
-        let currentWordIndex = 0;
-        let selectedTime = 180;
-        let timer = 180; 
-        let interval = null;
-        let isStarted = false;
-        let correctChars = 0;
-        let totalWordsAttempted = 0;
-        let errors = 0;
+    const input = document.getElementById('input-field');
+    const display = document.getElementById('word-container');
 
-        // ฟังก์ชันสลับ Array แบบสุ่ม (Fisher-Yates Shuffle)
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
+    function setTime(s, btn) {
+        if (isStarted) return;
+        selectedTime = timer = s;
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('timer').innerText = formatTime(s);
+    }
 
-        function setInitialTime(seconds, btn) {
-            if (isStarted) return;
-            selectedTime = seconds;
-            timer = seconds;
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateTimerDisplay();
-        }
+    function formatTime(s) {
+        return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+    }
 
-        // สร้างรายการคำแบบไม่ให้คำประเภทเดียวกันอยู่ติดกันมากเกินไป และสลับคำในคลัง
-        function generateWords() {
-            let pool = [];
-            // ผสมคำจากทุกกลุ่มเข้าด้วยกัน
-            Object.values(vocab).forEach(group => pool = pool.concat(group));
-            // สลับคำในคลังเพื่อหลีกเลี่ยงรูปแบบเดิมๆ
-            return shuffle([...pool, ...pool, ...pool]); // เพิ่มจำนวนเป็น 3 เท่าแล้วสลับ
-        }
+    function resetGame() {
+        clearInterval(interval);
+        isStarted = false;
+        timer = selectedTime;
+        currentIndex = 0; correctChars = 0; totalTyped = 0; errors = 0;
+        input.value = ""; input.disabled = false;
+        document.getElementById('timer').innerText = formatTime(timer);
+        document.getElementById('wpm').innerText = "0";
+        document.getElementById('accuracy').innerText = "0%";
+        document.getElementById('selector').style.opacity = "1";
+        
+        // สุ่มคำแบบไม่ซ้ำ (Shuffle)
+        words = [...vocab].sort(() => Math.random() - 0.5);
+        render();
+    }
 
-        function initGame() {
-            clearInterval(interval);
-            isStarted = false;
-            timer = selectedTime;
-            currentWordIndex = 0;
-            correctChars = 0;
-            totalWordsAttempted = 0;
-            errors = 0;
-            inputField.value = '';
-            inputField.disabled = false;
-            document.getElementById('time-selector').style.opacity = "1";
-            updateTimerDisplay();
-            wpmDisplay.innerText = "0";
-            accDisplay.innerText = "0%";
-            
-            words = generateWords();
-            renderWords();
-        }
+    function render() {
+        display.innerHTML = words.map((w, i) => `<span id="w-${i}" class="word ${i===0?'current':''}">${w}</span>`).join('');
+    }
 
-        function renderWords() {
-            wordContainer.innerHTML = '';
-            words.forEach((w, i) => {
-                const span = document.createElement('span');
-                span.innerText = w;
-                span.className = 'word' + (i === 0 ? ' current' : '');
-                span.id = `word-${i}`;
-                wordContainer.appendChild(span);
-            });
-        }
-
-        inputField.addEventListener('input', () => {
-            if (!isStarted && inputField.value.trim() !== "") {
-                isStarted = true;
-                document.getElementById('time-selector').style.opacity = "0.3";
-                startTimer();
-            }
-
-            const currentWord = words[currentWordIndex];
-            const typedValue = inputField.value;
-
-            if (!currentWord.startsWith(typedValue.trim())) {
-                inputField.classList.add('input-error');
-            } else {
-                inputField.classList.remove('input-error');
-            }
-
-            if (typedValue.endsWith(' ')) {
-                const finalTyped = typedValue.trim();
-                if (finalTyped === "") return;
-
-                const wordEl = document.getElementById(`word-${currentWordIndex}`);
-                totalWordsAttempted++;
-
-                if (finalTyped === currentWord) {
-                    wordEl.className = 'word correct';
-                    correctChars += currentWord.length + 1;
-                } else {
-                    wordEl.className = 'word incorrect';
-                    errors++;
-                }
-
-                currentWordIndex++;
-                inputField.value = '';
-                
-                // ถ้าใกล้หมดคำ ให้เติมคำใหม่และสลับอีกรอบ
-                if (currentWordIndex > words.length - 5) {
-                    const moreWords = generateWords();
-                    const oldLen = words.length;
-                    words = words.concat(moreWords);
-                    moreWords.forEach((w, i) => {
-                        const span = document.createElement('span');
-                        span.innerText = w; span.className = 'word';
-                        span.id = `word-${oldLen + i}`;
-                        wordContainer.appendChild(span);
-                    });
-                }
-                updateActiveWord();
-                calculateStats();
-            }
-        });
-
-        function updateActiveWord() {
-            document.querySelectorAll('.word').forEach(el => el.classList.remove('current'));
-            const active = document.getElementById(`word-${currentWordIndex}`);
-            if (active) {
-                active.classList.add('current');
-                active.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        function startTimer() {
+    input.addEventListener('input', () => {
+        if (!isStarted && input.value.trim() !== "") {
+            isStarted = true;
+            document.getElementById('selector').style.opacity = "0.2";
             interval = setInterval(() => {
                 timer--;
-                updateTimerDisplay();
-                calculateStats();
-                if (timer <= 0) {
-                    clearInterval(interval);
-                    inputField.disabled = true;
-                    alert(`จบการทดสอบ!\nWPM: ${wpmDisplay.innerText}\nความแม่นยำ: ${accDisplay.innerText}`);
-                }
+                document.getElementById('timer').innerText = formatTime(timer);
+                if (timer <= 0) endGame();
+                updateStats();
             }, 1000);
         }
 
-        function updateTimerDisplay() {
-            let mins = Math.floor(timer / 60);
-            let secs = timer % 60;
-            timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
+        const currentWord = words[currentIndex];
+        const val = input.value;
 
-        function calculateStats() {
-            const timeElapsed = selectedTime - timer;
-            if (timeElapsed > 0) {
-                const wpm = Math.round((correctChars / 5) / (timeElapsed / 60));
-                wpmDisplay.innerText = wpm;
-                const acc = Math.round(((totalWordsAttempted - errors) / totalWordsAttempted) * 100);
-                accDisplay.innerText = (acc >= 0 ? acc : 0) + "%";
+        // ไฮไลท์สีแดงในช่องพิมพ์ทันทีถ้าผิด
+        input.className = currentWord.startsWith(val.trim()) ? "" : "input-error";
+
+        if (val.endsWith(' ')) {
+            const typed = val.trim();
+            if (typed === "") { input.value = ""; return; }
+
+            const el = document.getElementById(`w-${currentIndex}`);
+            totalTyped++;
+
+            if (typed === currentWord) {
+                el.className = 'word correct';
+                correctChars += currentWord.length + 1;
+            } else {
+                el.className = 'word incorrect';
+                errors++;
             }
-        }
 
-        initGame();
-    </script>
+            currentIndex++;
+            input.value = "";
+            input.className = "";
+
+            // เติมคำเพิ่มถ้าใกล้หมด
+            if (currentIndex >= words.length - 2) {
+                const extra = [...vocab].sort(() => Math.random() - 0.5);
+                words = words.concat(extra);
+                render(); // Re-render เฉพาะเมื่อจำเป็น
+            }
+            
+            // เลื่อนตำแหน่งคำ
+            const nextEl = document.getElementById(`w-${currentIndex}`);
+            if (nextEl) {
+                nextEl.className = 'word current';
+                // ใช้ scrollTo แทน scrollIntoView เพื่อลดการค้าง
+                display.scrollTop = nextEl.offsetTop - 40;
+            }
+            updateStats();
+        }
+    });
+
+    function updateStats() {
+        const elapsed = selectedTime - timer;
+        if (elapsed > 0) {
+            const wpm = Math.round((correctChars / 5) / (elapsed / 60));
+            document.getElementById('wpm').innerText = wpm;
+            const acc = Math.round(((totalTyped - errors) / totalTyped) * 100);
+            document.getElementById('accuracy').innerText = (acc || 0) + "%";
+        }
+    }
+
+    function endGame() {
+        clearInterval(interval);
+        input.disabled = true;
+        alert("จบการทดสอบ!\nWPM: " + document.getElementById('wpm').innerText);
+    }
+
+    resetGame();
+</script>
+
 </body>
 </html>
