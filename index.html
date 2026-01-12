@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Police Typing Test - ระบบทดสอบพิมพ์สัมผัสตำรวจ</title>
+    <title>Police Typing Test v2 - ระบบทดสอบพิมพ์สัมผัสตำรวจ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -27,9 +27,6 @@
             min-height: 100vh;
         }
 
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: var(--main-gold); margin: 0; font-size: 2rem; }
-
         #stats-bar {
             display: flex;
             gap: 30px;
@@ -40,71 +37,56 @@
             border: 1px solid var(--main-gold);
         }
 
-        .stat-item { text-align: center; }
+        .stat-item { text-align: center; min-width: 80px; }
         .stat-value { display: block; font-size: 1.5rem; font-weight: bold; color: var(--main-gold); }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
 
         #word-container {
-            max-width: 900px;
+            max-width: 850px;
             height: 140px;
-            overflow: hidden;
-            font-size: 28px;
+            font-size: 26px;
             line-height: 1.6;
             background: #252a34;
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
-            position: relative;
-            user-select: none;
+            overflow: hidden;
+            word-wrap: break-word;
         }
 
-        .word { display: inline-block; margin-right: 15px; color: var(--text-muted); }
+        .word { display: inline-block; margin-right: 12px; color: var(--text-muted); }
         .word.current { color: var(--text-light); border-bottom: 3px solid var(--main-gold); }
         .word.correct { color: var(--success-green); }
-        .word.incorrect { color: var(--error-red); }
+        .word.incorrect { color: var(--error-red); text-decoration: underline; }
 
-        .input-wrapper { position: relative; width: 500px; }
-        
         #input-field {
-            width: 100%;
+            width: 500px;
             padding: 15px;
             font-size: 24px;
             border: 2px solid #3d4451;
             border-radius: 8px;
-            background: #ffffff;
-            color: #2d3436;
             outline: none;
             font-family: 'Sarabun', sans-serif;
-            box-sizing: border-box;
+            text-align: center;
         }
 
-        /* เมื่อพิมพ์ผิดในช่อง Input */
         #input-field.input-error {
             color: var(--error-red);
             background: #fff5f5;
-            border-color: var(--error-red);
         }
 
         .btn-reset {
-            margin-top: 30px;
-            padding: 10px 25px;
+            margin-top: 20px;
+            padding: 8px 20px;
             background: transparent;
             color: var(--main-gold);
             border: 1px solid var(--main-gold);
-            border-radius: 5px;
             cursor: pointer;
-            transition: 0.3s;
+            border-radius: 5px;
         }
-
-        .btn-reset:hover { background: var(--main-gold); color: #000; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>ระบบทดสอบการพิมพ์งานสอบสวน</h1>
-        <p>เวลาทดสอบ 3 นาที (มาตรฐานการสอบตำรวจ)</p>
-    </div>
 
     <div id="stats-bar">
         <div class="stat-item">
@@ -117,18 +99,15 @@
         </div>
         <div class="stat-item">
             <span id="accuracy" class="stat-value">0%</span>
-            <span class="stat-label">ความแม่นยำ</span>
+            <span class="stat-label">แม่นยำ</span>
         </div>
     </div>
 
-    <div id="word-container" id="display">
-        </div>
+    <div id="word-container"></div>
 
-    <div class="input-wrapper">
-        <input type="text" id="input-field" placeholder="เริ่มพิมพ์เพื่อสตาร์ทนาฬิกา..." autocomplete="off">
-    </div>
-
-    <button class="btn-reset" onclick="initGame()">เริ่มใหม่ / เปลี่ยนบทความ</button>
+    <input type="text" id="input-field" placeholder="เริ่มพิมพ์เพื่อจับเวลา..." autocomplete="off">
+    
+    <button class="btn-reset" onclick="initGame()">เริ่มใหม่</button>
 
     <script>
         const articles = [
@@ -136,18 +115,17 @@
             "ผู้เสียหายยืนยันว่าทรัพย์สินที่หายไปประกอบด้วยสร้อยคอทองคำหนักสองบาทและเงินสดจำนวนหนึ่งหมื่นบาทที่เก็บไว้ในตู้เสื้อผ้า",
             "เจ้าพนักงานตำรวจได้แจ้งสิทธิแก่ผู้ต้องหาว่าจะให้การหรือไม่ก็ได้ และมีสิทธิพบทนายความเพื่อปรึกษาคดีก่อนให้ปากคำ",
             "จากการตรวจสอบกล้องวงจรปิดพบคนร้ายเป็นชายสวมหมวกนิรภัยเต็มใบ ขับขี่รถจักรยานยนต์ไม่ติดแผ่นทะเบียนหลบหนีไปทางสี่แยก",
-            "ร้อยเวรเจ้าของคดีดำเนินการสอบสวนพยานแวดล้อมและรวบรวมพยานหลักฐานเพื่อขออนุมัติศาลออกหมายจับผู้ต้องหาตามลำดับ",
-            "บันทึกฉบับนี้จัดทำขึ้นต่อหน้าพยานสองท่านเพื่อให้การเป็นไปตามระเบียบของสำนักงานตำรวจแห่งชาติอย่างเคร่งครัด",
-            "ผู้ต้องหาให้การรับสารภาพตลอดข้อกล่าวหาโดยความสมัครใจและไม่มีการบังคับขู่เข็ญจากเจ้าพนักงานชุดจับกุมแต่อย่างใด"
+            "ร้อยเวรเจ้าของคดีดำเนินการสอบสวนพยานแวดล้อมและรวบรวมพยานหลักฐานเพื่อขออนุมัติศาลออกหมายจับผู้ต้องหาตามลำดับ"
         ];
 
         let words = [];
         let currentWordIndex = 0;
-        let timer = 180; // 3 นาที = 180 วินาที
+        let timer = 180;
         let interval = null;
         let isStarted = false;
-        let mistakes = 0;
-        let typedChars = 0;
+        let correctChars = 0;
+        let totalAttempts = 0;
+        let errorCount = 0;
 
         const wordContainer = document.getElementById('word-container');
         const inputField = document.getElementById('input-field');
@@ -160,16 +138,16 @@
             isStarted = false;
             timer = 180;
             currentWordIndex = 0;
-            mistakes = 0;
-            typedChars = 0;
+            correctChars = 0;
+            totalAttempts = 0;
+            errorCount = 0;
             inputField.value = '';
             inputField.disabled = false;
-            inputField.classList.remove('input-error');
             timerDisplay.innerText = "03:00";
             wpmDisplay.innerText = "0";
             accDisplay.innerText = "0%";
             
-            // เลือกบทความและสับคำเพื่อให้ไม่ซ้ำซาก
+            // ผสมคำใหม่
             const rawText = articles[Math.floor(Math.random() * articles.length)];
             words = rawText.split(' ');
             renderWords();
@@ -180,65 +158,60 @@
             words.forEach((w, i) => {
                 const span = document.createElement('span');
                 span.innerText = w;
-                span.className = 'word';
+                span.className = 'word' + (i === 0 ? ' current' : '');
                 span.id = `word-${i}`;
                 wordContainer.appendChild(span);
             });
-            document.getElementById('word-0').className = 'word current';
         }
 
-        inputField.addEventListener('input', () => {
-            if (!isStarted) startTimer();
+        inputField.addEventListener('input', (e) => {
+            if (!isStarted && inputField.value.trim() !== "") {
+                startTimer();
+            }
 
             const currentWord = words[currentWordIndex];
             const typedValue = inputField.value;
 
-            // ตรวจสอบตัวอักษรที่พิมพ์อยู่ตอนนี้ (Real-time Highlight)
-            if (currentWord.startsWith(typedValue.trim())) {
-                inputField.classList.remove('input-error');
-            } else {
+            // เช็คคำผิดแบบ Real-time (ในช่องพิมพ์)
+            if (!currentWord.startsWith(typedValue.trim())) {
                 inputField.classList.add('input-error');
+            } else {
+                inputField.classList.remove('input-error');
             }
 
-            // เมื่อกด Spacebar
+            // เมื่อกด Space
             if (typedValue.endsWith(' ')) {
                 const finalTyped = typedValue.trim();
                 const wordEl = document.getElementById(`word-${currentWordIndex}`);
+                totalAttempts++;
 
                 if (finalTyped === currentWord) {
                     wordEl.className = 'word correct';
-                    typedChars += currentWord.length;
+                    correctChars += currentWord.length + 1; // +1 สำหรับ Space
                 } else {
                     wordEl.className = 'word incorrect';
-                    mistakes++;
+                    errorCount++;
                 }
 
                 currentWordIndex++;
                 inputField.value = '';
-                inputField.classList.remove('input-error');
-
+                
                 if (currentWordIndex >= words.length) {
-                    // หากพิมพ์จบก่อนเวลา ให้โหลดบทความเพิ่ม (วนลูป)
+                    // วนลูปบทความใหม่
                     const nextText = articles[Math.floor(Math.random() * articles.length)];
                     words = words.concat(nextText.split(' '));
-                    renderWordsAfterLoop();
-                } else {
-                    updateActiveWord();
                 }
-                updateStats();
+                
+                updateActiveWord();
+                calculateStats();
             }
         });
-
-        function renderWordsAfterLoop() {
-            // ฟังก์ชันวาดคำต่อจากเดิม
-            updateActiveWord();
-        }
 
         function updateActiveWord() {
             document.querySelectorAll('.word').forEach(el => el.classList.remove('current'));
             const active = document.getElementById(`word-${currentWordIndex}`);
             if (active) {
-                active.className = 'word current';
+                active.classList.add('current');
                 active.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
@@ -247,29 +220,33 @@
             isStarted = true;
             interval = setInterval(() => {
                 timer--;
-                let mins = Math.floor(timer / 60);
-                let secs = timer % 60;
-                timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                updateTimerDisplay();
+                calculateStats(); // อัปเดต WPM ทุกวินาที
 
                 if (timer <= 0) {
-                    endGame();
+                    clearInterval(interval);
+                    inputField.disabled = true;
+                    alert("หมดเวลาทดสอบ!");
                 }
             }, 1000);
         }
 
-        function updateStats() {
-            const timePassed = (180 - timer) / 60; // นาที
-            const wpm = Math.round((currentWordIndex) / (timePassed || 1));
-            const acc = Math.round(((currentWordIndex - mistakes) / currentWordIndex) * 100);
-            
-            wpmDisplay.innerText = wpm > 0 ? wpm : 0;
-            accDisplay.innerText = (acc >= 0 ? acc : 0) + "%";
+        function updateTimerDisplay() {
+            let mins = Math.floor(timer / 60);
+            let secs = timer % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function endGame() {
-            clearInterval(interval);
-            inputField.disabled = true;
-            alert(`หมดเวลาการทดสอบ!\nความเร็วของคุณคือ: ${wpmDisplay.innerText} WPM\nความแม่นยำ: ${accDisplay.innerText}`);
+        function calculateStats() {
+            const timeElapsedInSeconds = 180 - timer;
+            if (timeElapsedInSeconds > 0) {
+                // สูตร WPM มาตรฐาน: (จำนวนตัวอักษรที่ถูก / 5) / (เวลาที่ใช้เป็นนาที)
+                const wpm = Math.round((correctChars / 5) / (timeElapsedInSeconds / 60));
+                wpmDisplay.innerText = wpm;
+                
+                const acc = Math.round(((totalAttempts - errorCount) / totalAttempts) * 100);
+                accDisplay.innerText = (acc >= 0 ? acc : 0) + "%";
+            }
         }
 
         initGame();
